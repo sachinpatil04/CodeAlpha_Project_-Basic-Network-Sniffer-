@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Network Sniffer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Network Sniffer</h1>
+    <table id="packets-table">
+        <thead>
+            <tr>
+                <th>Source IP</th>
+                <th>Destination IP</th>
+                <th>Protocol</th>
+                <th>Source Port</th>
+                <th>Destination Port</th>
+                <th>Payload</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        let showHex = false;
+
+        function togglePayloadView() {
+            showHex = !showHex;
+            document.getElementById('toggle-btn').textContent = showHex ? 'Show Text' : 'Show Hex';
+            fetchPackets();
+        }
+
+        async function fetchPackets() {
+            const response = await fetch('/packets');
+            const packets = await response.json();
+
+            const tbody = document.querySelector('#packets-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            if (packets.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align:center;">No packets captured yet.</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+
+            packets.forEach(packet => {
+                // Use only text payload since hex payload is not sent anymore
+                const payloadToShow = packet.payload;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${escapeHtml(packet.src_ip)}</td>
+                    <td>${escapeHtml(packet.dst_ip)}</td>
+                    <td>${escapeHtml(packet.protocol)}</td>
+                    <td>${escapeHtml(packet.src_port.toString())}</td>
+                    <td>${escapeHtml(packet.dst_port.toString())}</td>
+                    <td>${escapeHtml(payloadToShow)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+    </script>
+    <button id="toggle-btn" onclick="togglePayloadView()">Show Hex</button>
+    <script>
+        setInterval(fetchPackets, 2000);
+        fetchPackets();
+    </script>
+</body>
+</html>
