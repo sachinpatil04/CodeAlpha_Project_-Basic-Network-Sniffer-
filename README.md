@@ -22,7 +22,6 @@ python app.py
 
 ![Network Sniffer Output](images/network_sniffer_output.png)
 
-*Note: Please add the screenshot image file `network_sniffer_output.png` inside the `images` folder in the repository.*
 
 ## Contributing
 
