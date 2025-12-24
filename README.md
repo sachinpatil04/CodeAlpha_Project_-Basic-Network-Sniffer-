@@ -1,4 +1,4 @@
-# CodeAlpha Project - Basic Network Sniffer
+# Basic Network Sniffer
 
 This project is a basic network sniffer application implemented in Python. It includes a graphical user interface and templates for display.
 
